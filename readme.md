@@ -1,2 +1,2 @@
-# Server node js, postgre sql, online-store
+# Server node js, postgresql, online-store
 Для запуска проекта npm run dev
