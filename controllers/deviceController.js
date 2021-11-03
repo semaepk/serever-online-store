@@ -6,7 +6,7 @@ const ApiError = require('../error/ApiError');
 class DeviceController {
     async create(req, res, next) {
         try {
-            let {name, price, brandId, typeId, info, userId} = req.body
+            let {name, price, brandId, typeId, info} = req.body
             const {img} = req.files
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
@@ -67,7 +67,7 @@ class DeviceController {
 
         // device.rating = rate;
 
-        await Device.update({rating},{where:{ id: deviceId}})
+        // await Device.update({rating},{where:{ id: deviceId}})
 
         return res.json(device)
     }
