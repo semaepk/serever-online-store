@@ -1,12 +1,12 @@
 const uuid = require('uuid')
 const path = require('path');
-const {Device, DeviceInfo} = require('../models/models')
+const {Device, DeviceInfo, Rating} = require('../models/models')
 const ApiError = require('../error/ApiError');
 
 class DeviceController {
     async create(req, res, next) {
         try {
-            let {name, price, brandId, typeId, info} = req.body
+            let {name, price, brandId, typeId, info, userId} = req.body
             const {img} = req.files
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
@@ -32,10 +32,12 @@ class DeviceController {
 
     async getAll(req, res) {
         let {brandId, typeId, limit, page} = req.query
+        
         page = page || 1
         limit = limit || 9
         let offset = page * limit - limit
-        let devices;
+        let devices
+
         if (!brandId && !typeId) {
             devices = await Device.findAndCountAll({limit, offset})
         }
@@ -57,10 +59,46 @@ class DeviceController {
             {
                 where: {id},
                 include: [{model: DeviceInfo, as: 'info'}]
-            },
+            }
         )
+
+        // const rate = await Rating.findOne({ where: { userId , deviceId: device.id }})
+        // .then((rating) => rating.rate)
+
+        // device.rating = rate;
+
+        await Device.update({rating},{where:{ id: deviceId}})
+
         return res.json(device)
     }
+
+    async update(req, res){
+        
+        const device = await Device.update({$set: req.body}, {where:{ id: req.params.id}})
+
+        return res.json(device)  
+    }
+
+    async updateRating(req, res){
+
+        
+        const {userId , rating} = req.body
+        const deviceId = req.params.id
+
+        if (rating !== 0) {
+
+            Rating
+                .findOne({ where: { userId , deviceId } })
+                .then((obj) => {
+                    if(obj)
+                        return obj.update({rate: rating}, { where: { userId , deviceId } })
+                    return Rating.create({ userId , deviceId, rate: rating})
+            })
+        }
+            
+        return res.json({message: 'Рейтинг установлен'})  
+    }
+
 }
 
 module.exports = new DeviceController()
