@@ -62,41 +62,46 @@ class DeviceController {
             }
         )
 
-        // const rate = await Rating.findOne({ where: { userId , deviceId: device.id }})
-        // .then((rating) => rating.rate)
-
-        // device.rating = rate;
-
-        // await Device.update({rating},{where:{ id: deviceId}})
-
         return res.json(device)
     }
 
     async update(req, res){
         
-        const device = await Device.update({$set: req.body}, {where:{ id: req.params.id}})
+        // const device = await Device.update({$set: req.body}, {where:{ id: req.params.id}})
 
         return res.json(device)  
     }
 
     async updateRating(req, res){
 
-        
         const {userId , rating} = req.body
         const deviceId = req.params.id
 
         if (rating !== 0) {
 
-            Rating
+            await Rating
                 .findOne({ where: { userId , deviceId } })
                 .then((obj) => {
                     if(obj)
-                        return obj.update({rate: rating}, { where: { userId , deviceId } })
+                        return obj.update({rate: rating}).save()
                     return Rating.create({ userId , deviceId, rate: rating})
             })
         }
             
         return res.json({message: 'Рейтинг установлен'})  
+    }
+
+    async delete(req, res) {
+
+        const id = req.params.id
+
+        await Device.findOne({ where: { id  } })                                
+            .then((device) => device.destroy())
+
+        await DeviceInfo.findOne({where: {deviceId: id}})
+            .then((deviceInfo) => deviceInfo.destroy())    
+
+        return res.json({ message: 'Данные удалены'})
     }
 
 }

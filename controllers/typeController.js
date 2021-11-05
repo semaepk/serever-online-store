@@ -15,7 +15,7 @@ class TypeController {
 
     async delete(req, res) {
 
-        const type = Type.findOne({ where: { id: req.params.id } })
+        await Type.findOne({ where: { id: req.params.id } })
             .then((type) => {
                 type.destroy()
             })

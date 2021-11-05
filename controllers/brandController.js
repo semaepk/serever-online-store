@@ -14,7 +14,7 @@ class BrandController {
 
     async delete(req, res) {
 
-        Brand.findOne({ where: { id: req.params.id } })
+        await Brand.findOne({ where: { id: req.params.id } })
             .then((brand) => {
                 brand.destroy()
             })

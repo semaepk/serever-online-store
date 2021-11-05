@@ -15,7 +15,7 @@ class basketDeviceController {
 
     async delete(req, res) {
 
-        BasketDevice.findOne({ where: { id: req.params.id } })
+        await BasketDevice.findOne({ where: { id: req.params.id } })
             .then((basketDevice) => {
                 basketDevice.destroy()
             })
